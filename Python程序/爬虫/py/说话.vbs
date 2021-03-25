@@ -1,0 +1,1 @@
+CreateObject("SAPI.SpVoice").Speak"爱上了都能理解"

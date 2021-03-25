@@ -1,0 +1,31 @@
+package objict_o;
+
+import java.util.HashMap;
+import java.util.Scanner;
+
+
+public class map {
+	private HashMap<Integer,String> coin=new HashMap<Integer,String>();
+	public map()
+	{
+		coin.put(1,"penny");
+		coin.put(10,"dime");
+		coin.put(25,"quarter");
+		coin.put(50,"half-dollar");
+	}
+	public String getName(int amount)
+	{
+		coin.
+		return coin.get(amount);
+		
+	}
+	public void trc()
+	{
+		System.out.println(coin.get(1));
+	}
+	public static void main(String[] args) {
+		Scanner in=new Scanner(System.in);
+		map m1=new map();
+		System.out.println(m1.getName(in.nextInt()));
+	}
+}

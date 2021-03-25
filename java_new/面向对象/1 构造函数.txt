@@ -1,0 +1,23 @@
+package objict_o;
+
+public class Struct {
+	int time;
+	int money;
+	int price;	//会自动赋值
+	Struct()		//构造函数			
+	{
+		time=1;
+		money=0;
+		price=30;
+	}
+	
+	Struct(int price)	//重载构造函数
+	{
+		this();			//根据括号中的内容调用构造函数
+		this.price=price;
+	}
+	public static void main(String[] args) {
+		Struct a=new Struct();			//调用了Struct构造函数，没有构造函数会调用系统默认的构造函数
+		Struct b=new Struct(100);		
+	}
+}

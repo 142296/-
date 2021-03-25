@@ -1,0 +1,13 @@
+long i=1L;    用long 定义变量最后必须加‘l’或‘L’。
+float i=1.22f   用float 定义变量最后必须加’f’。
+
+boolean b=turn 
+boolean c=false    不能用数字代替
+switch(str)
+{
+case "abc":              //可以字符串
+}
+
+
+public                  //全局变量
+private                //类内局部变量

@@ -1,0 +1,15 @@
+package new_start;
+
+import java.util.Scanner;
+
+public class use_scan {
+			public static void main(String[] args) {
+				Scanner a = new Scanner(System.in);
+//				final int c=100;		定义常量			
+				System.out.print("请输入票面");
+				int c = a.nextInt();
+				System.out.print("请输入金额");
+				int b = a.nextInt();
+				System.out.println(c+"-" + b + " = " + (c-b));
+			}
+}

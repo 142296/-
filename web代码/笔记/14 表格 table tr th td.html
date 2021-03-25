@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表格</title>
+    <style>
+        table{
+            border:1px solid red;
+        }
+        th,td{
+            border:1px solid black;   
+            /*border 边界 solid 固体的*/
+            padding:5px;
+            /*格内间隔*/
+        }
+        caption{
+            padding:10px;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <caption>一些秘密</caption>
+        <tr>    <!--table row 一行-->
+            <th>姓名</th>  <!--table header cell表头元素-->
+            <th>年龄</th>
+            <th>喜欢的人</th>
+        </tr>
+        <tr>
+            <td>吕乐甜</td>  <!--table data cell表中元素-->
+            <td>19</td>
+            <td><abbr title='牛思育'>指上来看看</abbr></td>
+        </tr>
+        <tr>
+            <td>牛思育</td>
+            <td>18</td>
+            <td><abbr title='说不定是我呢'>不知道诶</abbr></td>
+        </tr>
+    </table>
+</body>
+</html>

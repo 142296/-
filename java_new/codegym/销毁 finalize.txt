@@ -1,0 +1,26 @@
+package zh.codegym.task.task06.task0602;
+
+/* 
+僵尸猫和僵尸狗
+*/
+
+public class Cat {
+    protected void finalize() throws Throwable          //销毁时运行
+    {
+        System.out.println("一个 Cat 被销毁");
+    }
+    public static void main(String[] args) {
+
+    }
+
+    //在此编写你的代码
+
+}
+
+class Dog {
+    protected void finalize() throws Throwable
+    {
+        System.out.println("一个 Dog 被销毁");
+    }
+    //在此编写你的代码
+}

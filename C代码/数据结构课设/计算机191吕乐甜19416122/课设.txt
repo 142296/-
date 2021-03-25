@@ -1,0 +1,635 @@
+#include<bits/stdc++.h>
+#include<Windows.h>
+#include <conio.h>
+#define  MAX_NUM   10
+using namespace std;
+
+struct customers {			//顾客数据结构
+	int ID;
+	int time;
+};
+struct Que {				//服务台的队伍的数据结构
+	queue<customers>q;
+	int leave_num;
+};
+customers admin;
+int admin_key;
+int Key = 0;		//子线程标志
+int Key1 = 0;		//子线程1标志
+int NUM = 6;
+Que Q[MAX_NUM];				//NUM个服务台
+HANDLE thread;
+HANDLE thread1;
+map<int, int>in_q, leave_key;			//哈希表来辅助队列
+int ID = 1;							//顾客序号记录
+int line = 0;
+int peekkey = 1;
+//系统参数
+int low_time = 10;		//顾客所需最少时间(分)
+int top_time = 20;		//顾客所需最长时间(分)
+int sleep = 50;			//每次输出时间间隔
+int cost = 3500;		//每个柜台需要的钱
+int N = 100;			//随机次数
+double in_l = 1;				//每一分钟有人加入的概率=1/(最短队伍人数*in_l) 
+double leave_l = 100;			//每一分钟有人离开的概率=最短队伍人数/leave_1)
+
+
+int min_index();						//获得最短的队伍的下标	
+void HideCursor();						//隐藏光标
+void gotoxy(int x, int y);                //光标移动到（x，y）位置
+DWORD WINAPI ThreadProc(LPVOID LpParameter);	//输出时间的子线程
+DWORD WINAPI Thread1Proc(LPVOID LpParameter);	//输出队伍信息的子线程
+void mean();							//输出主界面
+void add1();							//为简化主函数中case 1 而写
+void add(int n);						//加入顾客
+void leave(int n);						//有顾客离开
+void instructions();					//系统说明书
+void peek();							//输出排队情况
+void accelerate(int n);					//时间加速
+void accelerate1();						//为简化主函数中case 2 而写
+void in_line();							//用户入队
+void change();							//更改系统参数
+void simulation();						//模拟真实函数
+void summary();							//计算各个柜台数的花费和平均时间
+void in_out();							//决定有顾客加入或离开的随机函数
+int min_index()								//获得当前最小下标
+{
+	int min = Q[0].q.size() - Q[0].leave_num, mini = 0;
+	for (int i = 1; i < NUM; i++)
+	{
+		int n = Q[i].q.size() - Q[i].leave_num;
+		if (n < min)
+		{
+			min = n;
+			mini = i;
+		}
+		else
+			if (n == min)				//相等情况随机一个作为最小值（保证随机性）
+			{	
+				if (rand() % 2)
+				{
+					mini = i;
+				}
+			}
+	}
+	return mini;
+}
+void HideCursor()//隐藏光标
+{
+	CONSOLE_CURSOR_INFO cursor_info = { 1,0 };//第二个值为0表示隐藏光标
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);
+}
+
+void gotoxy(int x, int y)                //光标移动到（x，y）位置
+{
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X = x;
+	pos.Y = y;
+	SetConsoleCursorPosition(handle, pos);
+}
+
+//子线程
+DWORD WINAPI ThreadProc(LPVOID LpParameter)
+{//该线程每秒更新当前时间
+	while (Key)
+	{
+		gotoxy(0, line);
+		time_t now = time(0);
+		char dt[26];
+		errno_t err;
+		err = ctime_s(dt, 26, &now);
+		cout << "\t\t\t现在时刻：" << dt;
+		Sleep(1000);
+	}
+	return 0;
+}
+void in_out()
+{
+	int n = min_index();		//获得最短队伍下标
+	n = Q[n].q.size();			//最短队伍的人数
+	int in_q = rand() % int(in_l * (n + 1)); //入队概率  (1/(参数*最短队伍人数)  
+		//+1是为了防止最短队是0而引起程序崩溃
+	if (!in_q)					//是0 则有人入队
+	{
+		peekkey = 0;			//更改参数，防止输入提示词
+		add(1);					//队伍入1个人
+		peekkey = 1;
+	}
+	int le_q = rand() % int(leave_l);	//离队概率(n/参数)
+	if (le_q < n)					//小于n 则有人离队
+	{
+		int nID;
+		nID = rand() % ID;		//找一个号离队
+		while (leave_key[nID] != 0)	//这个人要在队中
+		{
+			nID = rand() % ID;
+		}
+		leave(nID);					//离队
+	}
+}
+DWORD WINAPI Thread1Proc(LPVOID LpParameter)		//不断输出当前排队信息的子线程
+{
+	while (Key1)
+	{
+		in_out();
+		accelerate(1);					//动一分钟
+		peekkey = 0;					//无提示词的情况
+		peek();							//输出结果
+		peekkey = 1;
+	}
+	return 1;
+}
+void mean()
+{
+	line = 0;
+	system("cls");
+	gotoxy(0, 0);
+	printf("************************************排队模拟系统******************************************\n\n\n");
+	line += 3;
+	printf("\t\t\t\t1加入顾客\n");
+	line++;
+	printf("\t\t\t\t2时间加速\n");
+	line++;
+	printf("\t\t\t\t3系统说明书\n");
+	line++;
+	printf("\t\t\t\t4查看排队情况\n");
+	line++;
+	printf("\t\t\t\t5我要排队\n");
+	line++;
+	printf("\t\t\t\t6模拟真实\n");
+	line++;
+	printf("\t\t\t\t7更改系统参数\n");
+	line++;
+	printf("\t\t\t\t8综合分析\n");
+	line++;
+	printf("\t\t\t\t9退出系统\n\n");
+	line += 2;
+	cout << endl << "提示：请按回车键进行下一步操作" << endl << endl << endl;
+	printf("************************************排队模拟系统******************************************\n\n\n");
+	printf("请输入:");
+	Key = 1;
+	thread = CreateThread(NULL, 0, ThreadProc, NULL, 0, NULL);				//输出时间的子线程
+}
+void add1()				//为简化主函数中case1 而写
+{
+	int n;
+	printf("请输入你要加入的顾客数量");
+	scanf_s("%d", &n);
+	getchar();
+	while (n < 0)
+	{
+		printf("错误输入");
+		printf("请重新输入(大于0)");
+		scanf_s("%d", &n);
+		getchar();
+	}
+	add(n);
+}
+void add(int n)			//加入顾客
+{
+	for (int i = 0; i < n; i++)
+	{
+		customers customer;
+		customer.ID = ID;				//顾客序号
+		int m = min_index();			//最短队
+		leave_key[ID] = 0;
+		in_q[ID] = m;					//顾客所在的队伍
+		ID++;							//顾客的序号++
+		customer.time = low_time + rand() % (top_time - low_time);	//随机生成顾客所需时间
+		Q[m].q.push(customer);			//顾客入队
+	}
+	if (peekkey)					//peekkey是为区别多次和单次 来确定是否需要提示词和暂停
+	{
+		printf("成功加入%d位虚拟顾客\n", n);
+		printf("按任意键返回");
+		getchar();
+	}
+}
+
+void leave(int n)			//顾客离开
+{
+	Q[in_q[n]].leave_num++;		//该队的离开人数+1
+	leave_key[n] = 1;			//记录该顾客已经离开
+}
+
+void instructions()			//系统说明书
+{
+	printf("中国人最不缺的就是人\n");
+	printf("而人多就要排队。\n");
+	printf("奇怪的是为什么每次你排的队总是走的最慢的一个\n");
+	printf("本系统就是用来模拟你排队的过程\n");
+	printf("功能一:用户确定排队顾客总人数，\n");
+	printf("\t所有虚拟顾客都只去排人最少的队\n");
+	printf("\t此时，用户可以查看队伍人数\n");
+	printf("\t也可以看队伍N分钟后的情况（此过程无人加入），但不能返回上一次的情况\n");
+	printf("\t而且不能查看队伍所需时间\n");
+	printf("功能二:据上面的信息，用户可以任选一个队伍排队\n");
+	printf("\t之后，用户可以查看三个队伍各自需要的时间\n");
+	printf("\t或者,开始模拟真实排队，\n");
+	printf("\t在真实排队过程中，用户可以在任意时刻选择换队\n");
+	printf("\t但真实排队也就意味着，每个队都可能在这个过程中有新顾客加入\n");
+	printf("功能三:计算出各个数量柜台顾客的等待时间和需要的花费");
+	getchar();
+}
+void peek()										//输出排队情况
+{
+	gotoxy(0, 0);								//定位(0,0)
+	for (int i = 0; i < NUM*65; i++)			//用空格来刷掉上次的输出，
+		printf("    ");							//防止清屏带来的闪烁
+	gotoxy(0, 0);								//再次定位(0,0)
+	for (int i = 0; i < NUM; i++)				
+	{
+		printf("队伍%d:", i + 1);
+		queue<customers>q1;
+		q1 = Q[i].q;
+		while (!q1.empty())						//队伍非空
+		{
+			customers t = q1.front();
+			q1.pop();
+			if (t.ID == admin.ID)				//用户
+				printf("● ");
+			else
+				if (leave_key[t.ID] == 0)		//顾客没走
+					printf("■ ");
+		}
+		putchar('\n');
+	}
+	if (peekkey)							//peekkey用来区分单次和多次
+	{										//判断是否需要输出提示词和停顿
+		printf("按任意键继续");
+		getchar();
+	}
+	Sleep(sleep);								//运行间隙
+}
+void accelerate1()							//为简化主函数中 case2而写的获取输入函数
+{
+	int n;
+	printf("请输入要跳过的时间");
+	scanf_s("%d", &n);
+	getchar();
+	while (n < 0)					//用户输入判断
+	{
+		printf("错误输入\n");
+		printf("请重新输入(大于0)");
+		scanf_s("%d", &n);
+		getchar();
+	}
+	printf("请选择：\n");			//两种结果观看模式
+	printf("1逐步观看\n");
+	printf("2只看结果");
+	char se;
+	se = _getch();
+	while (se <= '0' || se > '2')	//用户输入判断
+	{
+		printf("\n错误输入\n");
+		printf("请重新输入(1或2):");
+		se = _getch();
+	}
+	switch (se)
+	{
+	case '1':while (--n >= 0)	//逐步观看
+	{
+		accelerate(1);			//一次加速1分钟 即为逐步
+		peekkey = !n;			
+		peek();					//输出队伍情况
+	};
+			break;
+	case '2':accelerate(n); peek(); break;	//一次加速n分钟，即为直接看结果
+	default:break;
+	}
+	//accelerate(n);
+}
+void accelerate(int n)
+{
+	for (int i = 0; i < NUM; i++)
+	{
+		int ttime = n;					//临时变量
+		queue<customers>q1;				//临时队列
+		q1 = Q[i].q;					//赋值
+		while (!q1.empty() && ttime > 0)	//q1非空且时间未完
+		{
+			customers t = q1.front();		//需多次使用，加入临时变量减少代码长度
+			if (!leave_key[t.ID] || t.ID == admin.ID)		//是没走的顾客
+			{
+				if (ttime >= t.time)		//要跳过的时间大于顾客所需时间
+				{
+					if (t.ID == admin.ID)		//是用户
+						admin_key = 0;			//标记用户出队了
+					ttime -= t.time;			//减去时间
+					leave_key[t.ID] = 1;		//标记这个顾客离队了
+					in_q[t.ID] = -1;			//标记这个顾客所在队伍为-1
+					q1.pop();					//出队
+				}
+				else							//小于的情况
+				{
+					q1.front().time -= ttime;	//减去时间
+					ttime = 0;					//时间归0
+				}
+			}
+			else								//是走了的顾客
+			{
+				Q[i].leave_num--;				//记录队中已走顾客的量--
+				q1.pop();						//出队
+			}
+		}
+		Q[i].q = q1;							//应用已更改的队列
+	}
+}
+void in_line()									//用户入队
+{
+	int n;
+	printf("请选择你要进入的队伍");
+	scanf_s("%d", &n);
+	getchar();
+	n--;
+	while (n < 0 || n >= NUM)					//用户输入判断
+	{
+		printf("错误队号\n");;
+		printf("请重新输入(1~%d)",NUM);
+		scanf_s("%d", &n);
+		getchar();
+		n--;
+	}
+	customers t;
+	admin_key = 1;    //用户入队了
+	t.ID = ID;						//顾客序号
+	t.time = rand() % (top_time - low_time) + low_time;	//用户自己所需时长
+	in_q[ID] = n;					//记录用户的队号
+	ID++;						
+	admin = t;						//记录用户
+	Q[n].q.push(t);					//入队
+}
+void simulation()							//模拟现实排队
+{
+	while (1){
+		Key1 = 1;
+		char n;
+		thread1 = CreateThread(NULL, 0, Thread1Proc, NULL, 0, NULL);		//输出当前队伍情况的子线程
+		if (admin_key)			//用户在队中					
+		{
+			gotoxy(0, NUM * 2 + 3);											//光标定位后输出提示词
+			printf("输入队伍序号即可换队,输入0即可退出");
+			n = _getch();
+			if (admin_key)				//仍在队中，防止期间用户离队
+			{
+				n = n - '0';
+				Key1 = 0;
+				CloseHandle(thread1);									//关闭子线程
+				Sleep(100);												//缓冲一下，防止线程之间冲突
+				if (n == 0)												//0 退出
+					return;
+				n--;
+				while (n < 0 || n >= NUM || n == in_q[admin.ID])			//用户输入检测
+				{
+					printf("错误输入\n");						
+					printf("请重新输入(1~%d，且不能为:%d):",NUM,in_q[admin.ID]);
+					n = _getch();
+					if (n == '0')
+						return;
+					n -= '1';
+				}
+				leave_key[admin.ID] = 1;			//用户离队
+				Q[in_q[admin.ID]].leave_num++;		//该队离队人数++
+				admin.ID = ID;						//用户的新ID
+				in_q[admin.ID] = n;					//用户的新队号
+				admin_key = 1;						//用户在队中标志
+				ID++;								
+				Q[n].q.push(admin);					//入新队
+			}
+			else goto E;						
+		}
+		else									//用户不在队中
+		{
+			gotoxy(0, NUM*2+3);						//光标定位后输出提示词
+			printf("输入队伍序号即可加入队伍，输入0退出");
+			n = _getch();
+	E:		n -= '0';
+			Key1 = 0;
+			CloseHandle(thread1);					//关闭子线程
+			Sleep(100);								//缓冲，防止线程之间冲突
+			if (n == 0)								//0 退出
+				return;
+			n--;	
+			while (n < 0 || n > NUM)				//用户输入判断
+			{
+				printf("错误输入\n");
+				printf("请重新输入(1~%d):",NUM);	
+				n = _getch();
+				if (n == '0')
+					return;
+				n -= '1';
+			}
+			admin.ID = ID;										//用户ID
+			admin.time = rand() % (top_time - low_time) + low_time;	//用户所需时长
+			admin_key = 1;								//用户在队中标志
+			ID++;
+			Q[n].q.push(admin);							//入队
+		}
+	}
+}
+void change()
+{
+	while (1)
+	{
+		system("cls");
+		char se;
+		printf("请选择你要修改的内容:\n");
+		printf("1.顾客所需最短时间，当前:%d\n", low_time);
+		printf("2.顾客所需最长时间，当前:%d\n", top_time);
+		printf("3.有顾客离开的概率，当前:(最短队伍长度/%.1lf)\n", leave_l);
+		printf("4.有顾客加入的概率，当前:1/(%.1lf*最短队伍长度)\n", in_l);
+		printf("5.每次输出的时间间隔，当前%dms\n", sleep);
+		printf("6.每个柜台需要的花费，当前%d 元\n", cost);
+		printf("7.柜台数量，当前%d 个\n", NUM);
+		printf("8.随机的次数(每次都可能有人离开，有人加入)当前是%d\n",N);
+		printf("9.返回主界面\n");
+		printf("请选择:\n");
+		se = _getch();
+		int temp;
+		double t;
+		switch (se)
+		{
+		case '1':
+			printf("顾客所需最短时间当前:%d\n", low_time);
+			printf("请输入目标值:");
+			scanf_s("%d", &temp);
+			while (temp < 0)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(大于0):");
+				scanf_s("%d", &temp);
+			}
+			low_time = temp;
+			getchar();
+			break;
+		case '2':
+			printf("顾客所需最长时间当前:%d\n", top_time);
+			printf("请输入目标值:");
+			scanf_s("%d", &temp);
+			while (temp < low_time)
+			{
+				printf("错误输入,输入值应大于最短时间%d\n", low_time);
+				printf("请重新输入(大于%d):",low_time);
+				scanf_s("%d", &temp);
+			}
+			top_time = temp;
+			getchar();
+			break;
+		case '3':
+			printf("顾客离开的概率，当前:1/(%.1lf*最短队伍长度)\n", leave_l);
+			printf("您将更改'%.1lf'为其他值\n", leave_l);
+			printf("请输入目标值:");
+			scanf_s("%lf", &t);
+			while (t <= 0)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(大于等于0):");
+				scanf_s("%lf", &t);
+			}
+			leave_l = t;
+			getchar();
+			break;
+		case '4':
+			printf("顾客加入的概率，当前:1/(%.1lf*最短队伍长度)\n", in_l);
+			printf("您将更改'%.1lf'为其他值\n", in_l);
+			printf("请输入目标值:");
+			scanf_s("%lf", &t);
+			while (t <= 0)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(大于等于0):");
+				scanf_s("%lf", &t);
+			}
+			in_l = t;
+			getchar();
+			break;
+		case '5':
+			printf("每次输出的时间间隔，当前%dms\n", sleep);
+			printf("请输入目标值：（>=30）");
+			scanf_s("%d", &temp);
+			while (temp < 30)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(>=30):");
+				scanf_s("%d", &temp);
+			}
+			sleep = temp;
+			getchar();
+			break;
+		case '6':
+			printf("每个柜台的成本，当前%d元\n", cost);
+			printf("请输入目标值:(>=0)");
+			scanf_s("%d", &temp);
+			while (temp < 0)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(>=0)：");
+				scanf_s("%d", &temp);
+			}
+			cost = temp;
+			getchar();
+			break;
+		case '7':
+			printf("柜台数量，当前%d个\n", NUM);
+			printf("请输入目标值:(1~9)");
+			scanf_s("%d", &temp);
+			while (temp < 1 || temp>9)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(1~9):");
+				scanf_s("%d", &temp);
+			}
+			NUM = temp + 1;
+			getchar();
+			break;
+		case '8':
+			printf("随机的次数（每次都可能有人加入有人离开),当前是%d\n", N);
+			printf("请输入目标值:(>0，大一点才有参考性)");
+			scanf_s("%d", &temp);
+			while (temp < 0)
+			{
+				printf("错误输入\n");
+				printf("请重新输入(>0)");
+				scanf_s("%d", &temp);
+			}
+			N = temp;
+			getchar();
+			break;
+		case '9':return;
+		}
+	}
+}
+void summary()
+{
+	int temp = NUM;					
+	int Count = 7;					//模拟次数
+	int customer_num = 0;			//顾客数量
+	for (NUM = 1; NUM < MAX_NUM; NUM++)		//每一种队数
+	{
+		int count = Count;
+		int sum1 = 0;
+		customer_num = 0;
+		while (count--)
+		{
+			int n = N;
+			int sum = 0;
+			ID = 0;
+			while (n--)
+			{
+				in_out();			//先随机生成人
+			}
+			for (int i = 0; i < NUM; i++)		//每一队
+			{
+				while (!Q[i].q.empty())			//队列非空
+				{
+					customers t = Q[i].q.front();
+					Q[i].leave_num = 0;
+					Q[i].q.pop();
+					if (leave_key[t.ID] == 0)			//顾客在队中
+					{
+						sum += t.time;
+						leave_key[t.ID] = 1;
+						customer_num++;
+					}
+				}
+				
+			}
+			sum1 += sum;
+		}
+		printf("%d个服务台需要%d元成本，平均每个顾客需要%d分.平均服务顾客%.2f个,平均每个柜台服务%.2f个\n", NUM, cost * NUM, sum1/Count / NUM,customer_num*1.0/Count,customer_num*1.0/NUM/Count);
+		}
+	NUM = temp;
+	getchar();
+}
+int main()
+{
+	for (int i = 0; i < NUM; i++)
+	{
+		Q[i].leave_num = 0;		//初始化
+	}
+	srand(time(0));
+	HideCursor();				//隐藏光标
+	while (1)
+	{
+		char select;
+		mean();
+		select = _getch();
+		Key = 0;
+		CloseHandle(thread);		//关闭子线程
+		system("cls");				
+		switch (select)				//8个功能
+		{
+		case '1':add1(); break;				
+		case '2':accelerate1(); break;
+		case '3':instructions(); break;
+		case '4':peek(); break;
+		case '5':in_line(); break;
+		case '6':simulation(); break;
+		case '7':change(); break;
+		case '8':summary(); break;
+		case '9':return 0;
+		default:printf("错误输入\n");
+		}
+	}
+}

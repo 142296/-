@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        th,td{
+            border:1px solid black;
+        }
+        th{
+            background-color:aquamarine;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <caption>一些秘密</caption>
+        <thead>
+        <tr>    <!--table row 一行-->
+            <th>号</th>
+            <th>姓名</th>  <!--table header cell表头元素-->
+            <th>年龄</th>
+            <th>喜欢的人</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th>一</th>
+            <td>吕乐甜</td>  <!--table data cell表中元素-->
+            <td>19</td>
+            <td><abbr title='牛思育'>指上来看看</abbr></td>
+        </tr>
+        <tr>
+            <th>二</th>
+            <td>牛思育</td>
+            <td>18</td>
+            <td><abbr title='说不定是我呢'>不知道诶</abbr></td>
+        </tr>
+    </tbody>
+        <tfoot>
+            <td colspan="4">最终解释权归小牛同学所有</td>
+            <!--跨四列-->
+            <!--rowspan跨四行，同用法-->
+        </tfoot>
+    </table>
+</body>
+</html>

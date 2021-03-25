@@ -1,0 +1,29 @@
+import java.util.HashSet;
+import java.util.Iterator;
+public class Solution {
+    public static void main(String[] args) throws Exception {
+        //在此编写你的代码
+        HashSet<String> set = new HashSet<String>();
+        set.add("西瓜");
+        set.add("香蕉");
+        set.add("樱桃");
+        set.add("梨");
+        set.add("哈密瓜");
+        set.add("黑莓");
+        set.add("人参");
+        set.add("草莓");
+        set.add("鸢尾花");
+        set.add("土豆");
+        Iterator<String> s = set.iterator();
+        while(s.hasNext())
+        {
+            String S = s.next();
+            System.out.println(S);
+        }
+      //  for(String s:set)
+        //{
+          //  System.out.println(s);
+    //    }
+        
+    }
+}

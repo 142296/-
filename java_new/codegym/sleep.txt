@@ -1,0 +1,12 @@
+public class Solution {
+    public static void main (String[] args)throws InterruptedException {
+        for (int i = 30; i >= 0; i--) {
+            System.out.println(i);
+
+            //在此编写你的代码
+            Thread.sleep(100);//延迟100毫秒
+        }
+
+        System.out.println("呯！");
+    }
+}

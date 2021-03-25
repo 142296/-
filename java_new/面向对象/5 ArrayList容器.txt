@@ -1,0 +1,47 @@
+package objict_o;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+
+public class type {
+	private ArrayList<String> a=new ArrayList<String>();	//容器
+	public void add(String s)			//加入
+	{
+		a.add(s);
+	}
+	public void insert(String s,int index)	//插入
+	{
+		a.add(index,s);
+	}
+	public void remove(int index)			//删除
+	{
+		a.remove(index);
+	}
+	public int getSize()					//getsize
+	{
+		return a.size();
+	}
+	public String getNote(int index)		//获得内容
+	{
+		return a.get(index);
+	}
+	public String[] list() 					//列出所有
+	{
+		String[] S=new String[a.size()];
+		a.toArray(S);
+		return S;
+	}
+	public static void main(String[] args) {
+		Scanner in=new Scanner(System.in);
+		type note=new type();
+		note.add("first");
+		note.add("second");
+		note.insert("third",1);
+		String[] S=note.list();
+		for(String s:S)
+		{
+			System.out.println(s);
+		}
+	}
+}

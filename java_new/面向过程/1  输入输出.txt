@@ -1,0 +1,11 @@
+package new_start;
+
+import java.util.Scanner;
+
+public class n1 {
+	public static void main(String[] args) {
+		System.out.print("输入:");
+		Scanner a = new Scanner(System.in);		//变量a接受输入
+		System.out.println("echo:" + a.nextLine());	//输出变量a
+	}
+}

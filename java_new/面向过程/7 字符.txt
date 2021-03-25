@@ -1,0 +1,32 @@
+//java使用Unicode编码，所以汉字也是一个char
+package new_start;
+
+public class str {
+		public static void main(String[] args) {
+			char a='汉';
+			for(int i=0;i<3;i++)
+			{
+				System.out.println(a++);
+			}
+			String s=new String("a string");
+			String s1="hello";
+			System.out.println(s1);
+			System.out.println(s1.equals(s));	//比较字符串是否相同
+			System.out.println(s1.compareTo(s));	//相当于strcmp
+			for(int i=0;i<s.length();i++)		//遍历字符串
+			{
+				System.out.println(s.charAt(i));
+			}
+			System.out.println(s.substring(2));		//输出子串
+			System.out.println(s.substring(2,5));	//输出子串
+			System.out.println(s.indexOf(' ',0));		//寻找元素,第二个参数是起点，可无
+			System.out.println(s.indexOf("str"));		//寻找子串
+			//s.lastIndexOf(s1);	//寻找最后一个位置出现
+			//s.startsWith(prefix);	//判断字符串是不是以某串开始或结尾
+			//s.endsWith(suffix);
+			//s.trim();//	删除两端的空格
+			//s.replace(oldChar, newChar);//用新的替换旧的
+			//s.toLowerCase();	//全变成大写或小写
+			//s.toUpperCase();
+		}
+}

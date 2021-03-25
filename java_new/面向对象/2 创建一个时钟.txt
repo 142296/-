@@ -1,0 +1,36 @@
+package objict_o;
+
+public class Display {
+	private int value;
+	private int limit;
+	
+	public Display(int limit)
+	{
+		this.limit=limit;
+	}
+	public void increase()
+	{
+		value++;
+		if(value==limit)
+		{
+			value=0;
+		}
+	}
+	public int getValue() 
+	{
+		return value;
+	}
+	public static void main(String[] args) {
+		Display a=new Display(24);
+		Display b=new Display(60);
+		for(;;)
+		{
+			b.increase();
+			if(b.getValue()==0)
+			{
+				a.increase();
+			}
+			System.out.printf("%02d:%02d\n",a.getValue(),b.getValue());
+		}
+	}
+}

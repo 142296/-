@@ -1,0 +1,21 @@
+InputStream inputStream = System.in;
+Reader inputStreamReader = new InputStreamReader(inputStream);
+BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+String name = bufferedReader.readLine(); //从键盘读取字符串
+String sAge = bufferedReader.readLine(); //从键盘读取字符串
+int nAge = Integer.parseInt(sAge); //将字符串转换为数字。
+
+
+
+BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+String name = reader.readLine();
+String sAge = reader.readLine();
+int nAge = Integer.parseInt(sAge);
+
+
+
+Scanner in = new Scanner(System.in);
+while(in.hasNextInt())			//检测是否有输入 
+	int a = in.nextInt();

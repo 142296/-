@@ -1,0 +1,17 @@
+public static void main(String[] args)
+{
+    List<String> list = new ArrayList<String>();
+    list.add("西班牙");
+    list.add("的");
+    list.add("雨");
+
+    Iterator<String> iterator = list.iterator();// 获取列表的迭代器
+
+    while (iterator.hasNext())      // 检查是否存在另一个元素
+    {
+        // 获取当前元素并移至下一个
+        String text = iterator.next();
+
+        System.out.println(text);
+    }
+}

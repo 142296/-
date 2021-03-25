@@ -1,0 +1,1 @@
+所有类都是Object类的子类，Object类中有一些默认方法，但不太好用，可以用Source中的Override去覆盖旧方法。

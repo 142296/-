@@ -1,0 +1,2 @@
+子类的构造函数中如果没有super会默认调用super()。
+有super(x)只会调用super(x)

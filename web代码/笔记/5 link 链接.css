@@ -1,0 +1,16 @@
+body{
+	background:blue;                    /*背景蓝色*/
+	background-image: url("1.jpg")	/*背景图片*/	
+}
+h1	{color:red;
+	text-align:center;     /*可选左中右*/  
+	}
+	p{
+	color:blue;		
+	margin-left: 60%;	/*距左边百分之60*/
+	}
+img{
+	position:absolute;     /*绝对位置*/
+	left:50%;		/*距左边框距离*/
+	margin-left:181px;	/*右移像素，right不可以*/
+	}

@@ -1,0 +1,4 @@
+ArrayList<Integer> list = new ArrayList<Integer>();
+list.add(0,x); //头部插入元素，剩余元素全部后移
+list.get(i);
+list.remove(i);
