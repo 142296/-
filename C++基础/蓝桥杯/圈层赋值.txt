@@ -1,0 +1,84 @@
+#include <iostream>
+#include<bits/stdc++.h>
+using namespace std;
+
+#define N 150
+void show(int a[N][N], int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (a[i][j])
+				cout << '$';
+			else
+				cout << '.';
+		}
+		putchar('\n');
+	}
+}
+int main()
+{
+	int n;
+	cin >> n;
+	int count = 5 + 2 * 2 * n;
+	int size = count - 4;
+	int a[N][N] = { 0 };
+	int x = 0, y = 2;
+	for (int i = 0; i <= n; i++)
+	{
+		for (int j = 0; j < size - 1; j++)		//横 
+		{
+			a[x][++y] = 1;
+		}
+		for (int j = 0; j < 2; j++)		//竖 2
+		{
+			a[++x][y] = 1;
+		}
+		for (int j = 0; j < 2; j++)		//横 2
+		{
+			a[x][++y] = 1;
+		}
+		for (int j = 0; j < size - 1; j++)		//竖 
+		{
+			a[++x][y] = 1;
+		}
+		for (int j = 0; j < 2; j++)		//横2
+		{
+			a[x][--y] = 1;
+		}
+		for (int j = 0; j < 2; j++)		//竖2
+		{
+			a[++x][y] = 1;
+		}
+		for (int j = 0; j < size - 1; j++)		//横 
+		{
+			a[x][--y] = 1;
+		}
+		for (int j = 0; j < 2; j++)			//竖2 
+		{
+			a[--x][y] = 1;
+		}
+		for (int j = 0; j < 2; j++)			//横2
+		{
+			a[x][--y] = 1;
+		}
+		for (int j = 0; j < size - 1; j++)		//竖
+		{
+			a[--x][y] = 1;
+		}
+		for (int j = 0; j < 2; j++)			//横2 
+		{
+			a[x][++y] = 1;
+		}
+		for (int j = 0; j < 2; j++)			//竖2 
+		{
+			a[--x][y] = 1;
+		}
+		x += 2;
+		y += 2;
+		size -= 4;
+	}
+	show(a, count);
+
+}
